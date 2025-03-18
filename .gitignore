@@ -1,2 +1,6 @@
 *.log
 .vsocde
+build
+managed_components
+sdkconfig.old
+sdkconfig
