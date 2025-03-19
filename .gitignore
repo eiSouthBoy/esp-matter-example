@@ -1,5 +1,5 @@
 *.log
-.vsocde
+.vscode
 build
 managed_components
 sdkconfig.old
