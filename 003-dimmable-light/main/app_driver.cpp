@@ -44,7 +44,7 @@ void led_indicator_load_brightness(uint8_t &brightness)
     err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &handle);
     if (err != ESP_OK)
     {
-        ESP_LOGI(TAG, "nvs_open failed");
+        ESP_LOGE(TAG, "nvs_open failed");
         return;
     }
 
@@ -52,7 +52,7 @@ void led_indicator_load_brightness(uint8_t &brightness)
     esp_err_t ret = nvs_get_u8(handle, BRIGHTNESS_KEY, &val);
     if (ret != ESP_OK)
     {
-        ESP_LOGI("NVS", "No saved brightness, using default");
+        ESP_LOGW("NVS", "No saved brightness, using default");
     }
     nvs_close(handle);
     brightness = val;
@@ -76,7 +76,7 @@ void led_indicator_load_power(bool &power)
     err = nvs_open(NVS_NAMESPACE, NVS_READONLY, &handle);
     if (err != ESP_OK)
     {
-        ESP_LOGI(TAG, "nvs_open failed");
+        ESP_LOGE(TAG, "nvs_open failed");
         return;
     }
 
@@ -84,7 +84,7 @@ void led_indicator_load_power(bool &power)
     esp_err_t ret = nvs_get_u8(handle, BRIGHTNESS_KEY, &val);
     if (ret != ESP_OK)
     {
-        ESP_LOGI("NVS", "No saved power, using default");
+        ESP_LOGW("NVS", "No saved power, using default");
     }
     nvs_close(handle);
     power = static_cast<bool>(val);
@@ -97,7 +97,8 @@ static esp_err_t app_driver_light_set_power(led_indicator_handle_t handle, esp_m
 {
 #if CONFIG_BSP_LEDS_NUM > 0
     esp_err_t err = ESP_OK;
-    ESP_LOGI(TAG, "---------------> LED set power: %d (%s) <---------------", val->val.b, val->val.b ? "ON" : "OFF");
+    ESP_LOGI(TAG, "---------------> LED set power: %d (%s) <---------------",
+             val->val.b, val->val.b ? "ON" : "OFF");
     if (val->val.b)
     {
         err = led_indicator_start(handle, BSP_LED_ON);
@@ -129,7 +130,7 @@ static esp_err_t app_driver_light_set_brightness(led_indicator_handle_t handle, 
 
 static void app_driver_button_toggle_cb(void *arg, void *data)
 {
-    ESP_LOGI(TAG, "Toggle button pressed");
+    ESP_LOGI(TAG, "---------------> Toggle button pressed <---------------");
     uint16_t endpoint_id = g_light_endpoint_id;
     uint32_t cluster_id = OnOff::Id;
     uint32_t attribute_id = OnOff::Attributes::OnOff::Id;
@@ -172,9 +173,10 @@ esp_err_t app_driver_light_set_defaults(uint16_t endpoint_id)
     void *priv_data = endpoint::get_priv_data(endpoint_id);
     led_indicator_handle_t handle = (led_indicator_handle_t)priv_data;
     esp_matter_attr_val_t val = esp_matter_invalid(NULL);
+    attribute_t *attribute = nullptr;
 
     /* Setting brightness */
-    attribute_t *attribute = attribute::get(endpoint_id, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
+    attribute = attribute::get(endpoint_id, LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
     attribute::get_val(attribute, &val);
     err |= app_driver_light_set_brightness(handle, &val);
 

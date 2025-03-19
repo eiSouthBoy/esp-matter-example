@@ -167,6 +167,7 @@ extern "C" void app_main()
     uint8_t brightness;
     led_indicator_load_power(powerState);
     led_indicator_load_brightness(brightness);
+    g_light_power = powerState;
 
     /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
     node::config_t node_config;
